@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.RoleMapper">
+    <!--保存角色和权限之间的关系-->
+    <insert id="saveRoleAndPermission">
+        insert into sys_role_permission(rid, pid) values (#{rid},#{pid})
+    </insert>
+    <!--保存用户和角色表数据-->
+    <insert id="addUserRole">
+        insert into sys_role_user(uid,rid) values (#{id},#{rid})
+    </insert>
+    <!--通过角色id删除权限跟角色关系表-->
+    <delete id="deleteRoleAndPermissionById" parameterType="java.io.Serializable">
+        delete from sys_role_permission where rid =#{id}
+    </delete>
+    <!--通过角色id删除用户跟角色关系表-->
+    <delete id="deleteRoleAndUserById" parameterType="java.io.Serializable">
+         delete from sys_role_user where rid =#{id}
+    </delete>
+    <!--根据用户id删除用户和角色关系表数据-->
+    <delete id="deleteUserAndRoleByUserId" parameterType="java.io.Serializable">
+        delete from sys_role_user where uid =#{id}
+    </delete>
+    <!--根据角色ID查询当前角色拥有的所有的权限或菜单ID-->
+    <select id="queryRolePermissionIdsByRid" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select pid from sys_role_permission where rid=#{roleId}
+    </select>
+    <!--根据用户ID查询当前用户拥有的角色id集合-->
+    <select id="queryRoleUserIdsByUid" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select rid from sys_role_user where uid =#{uid}
+    </select>
+</mapper>

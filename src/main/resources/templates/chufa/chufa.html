@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>客户管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="/resources/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/resources/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 5px;">
+    <legend>查询条件</legend>
+</fieldset>
+<blockquote class="layui-elem-quote">
+    <form action="" method="post" id="searchFrm" lay-filter="searchFrm" class="layui-form layui-form-pane">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">违规店铺</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">违规产品</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">开始时间</label>
+                <div class="layui-input-inline">
+                    <input type="tel" name="" id="startTime" readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">结束时间</label>
+                <div class="layui-input-inline">
+                    <input type="tel" name="" id="endTime"  readonly="readonly" placeholder="yyyy-MM-dd HH:mm:ss" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="doSearch"><span class="layui-icon layui-icon-search"></span>查询</button>
+                <button type="reset" class="layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</blockquote>
+
+<!-- 数据表格 -->
+<div>
+    <table class="layui-hide" id="chufaTable" lay-filter="chufaTable"></table>
+    <div id="chufaToolBar" style="display: none;">
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-add-1"></span>添加处罚</button>
+    </div>
+
+    <div id="chufaRowBar" style="display: none;">
+        <button type="button" lay-event="update" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-edit"></span>更新</button>
+        <button type="button" lay-event="delete" class="layui-btn layui-btn-sm layui-btn-danger"><span class="layui-icon layui-icon-delete"></span>删除</button>
+    </div>
+</div>
+
+<!--添加和修改-->
+<div style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form action="" method="post" class="layui-form layui-form-pane" id="dataFrom" lay-filter="dataFrom">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">违规店铺</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id">
+                    <input type="text" name="dpname" class="layui-input" lay-verify="required" placeholder="请输入违规店铺">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">违规原因</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="dpyy" class="layui-input" lay-verify="required" placeholder="请输入违规原因">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">罚款金额</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="dpmoney" class="layui-input" lay-verify="required" placeholder="请输入罚款金额">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">扣除信用分</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input"  name="dpxyf" lay-verify="required" placeholder="请输入扣除信用分">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">进货备注</label>
+            <div class="layui-input-block">
+                <textarea  name="dpremake" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center">
+                <button type="button" class="layui-btn" lay-submit="" id="doSubmit"><span class="layui-icon layui-icon-search"></span>提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm"  id="doReset"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="/resources/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['jquery','form','table','layer','laydate'],function(){
+        var $=layui.jquery;
+        var form=layui.form;
+        var table=layui.table;
+        var layer=layui.layer;
+        var laydate=layui.laydate;
+
+        //初始化时间选择器
+        laydate.render({
+            elem:'#startTime',
+            type:'datetime'
+        });
+        laydate.render({
+            elem:'#endTime',
+            type:'datetime'
+        });
+
+        //加载数据
+        var tableIns=table.render({
+            elem: '#chufaTable'
+            ,url:'/resources/json/dp.json'
+            ,toolbar: '#chufaToolBar' //开启头部工具栏，并为其绑定左侧模板
+            ,title: '店铺产品违规处罚数据表'
+            ,height:'full-220'
+            ,page: true
+            ,cols: [ [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'违规ID',align:'center',width:'100'}
+                ,{field:'dpname', title:'违规店铺',align:'center',width:'200'}
+                ,{field:'dpyy', title:'违规原因',align:'center',width:'170'}
+                ,{field:'dpmoney', title:'罚款金额',align:'center',width:'100'}
+                ,{field:'dpxyf', title:'扣除信用分',align:'center',width:'150'}
+                ,{field:'dpremake', title:'备注',align:'center',width:'200'}
+                ,{field:'logintime', title:'违规时间',align:'center',width:'200'}
+                ,{fixed: 'right', title:'操作', toolbar: '#chufaRowBar',align:'center',width:'200'    }
+            ] ]
+        });
+
+        //监听工具条的事件
+        table.on("toolbar(chufaTable)",function(obj){
+            switch(obj.event){
+                case 'add':
+                    openAdd();
+                    break;
+            }
+        });
+
+        //监听行工具条的事件
+        table.on("tool(chufaTable)",function(obj){
+            var data = obj.data; //获得当前行数据
+            switch(obj.event){
+                case 'delete':
+                    openDelete(data);
+                    break;
+                case 'update':
+                    openUpdate(data);
+                    break;
+            }
+        });
+
+        var mainIndex;
+        var url;
+        // 打开添加的弹出层
+        function openAdd() {
+            mainIndex = layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                title:'添加处罚',
+                area:['800px','600px'],
+                success:function () {
+                    url = "";
+                }
+            })
+        }
+
+
+        //打开修改的弹出层
+        function openUpdate(data){
+            layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                area:['800px','600px'],
+                title:'修改处罚',
+                success:function(){
+                    $("#dataFrom")[0].reset(); //重置
+                    form.val("dataFrom",data);//装载数据
+                    $(".layui-table").find('td').data('dpname', false);
+                    url="";
+                }
+            })
+        }
+
+        // 添加Or修改的提交事件
+        form.on("submit(doSubmit)",function(data){
+            $.post(url,data.field,function(res){
+                layer.close(mainIndex);
+            });
+            return false;
+        });
+
+
+        //删除
+        function openDelete(data) {
+            layer.confirm('你确定要删除这条违规处罚吗?', {icon: 3, title:'提示'}, function(index){
+                $.post("",{id:data.id},function(res){
+                });
+                layer.close(index);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
